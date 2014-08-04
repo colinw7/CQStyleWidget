@@ -1,0 +1,5 @@
+. hierarchy (style group) or widget name ?
+. style for non-label widgets
+. set property by style h1.font, h2.color, ...
+. style desc
+. custom widget support (fore/back/font) or rely on notifications
