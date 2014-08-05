@@ -23,5 +23,5 @@ INCLUDEPATH += \
 .
 
 unix:LIBS += \
--L../lib \
--lCQStyleWidget
+-L../lib -L../../CQUtil/lib \
+-lCQStyleWidget -lCQUtil
