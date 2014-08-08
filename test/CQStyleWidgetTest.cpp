@@ -23,19 +23,25 @@ CQStyleWidgetTest()
   layout->setMargin(2); layout->setSpacing(2);
 
   QVBoxLayout *llayout = new QVBoxLayout;
-  llayout->setMargin(2); llayout->setSpacing(2);
+  llayout->setMargin(0); llayout->setSpacing(0);
 
-  QLabel *label1 = CQStyleWidgetMgrInst->addT(new QLabel("Header 1" ), "h1");
-  QLabel *label2 = CQStyleWidgetMgrInst->addT(new QLabel("Header 2" ), "h2");
-  QLabel *label3 = CQStyleWidgetMgrInst->addT(new QLabel("Header 3" ), "h3");
-  QLabel *label4 = CQStyleWidgetMgrInst->addT(new QLabel("Header 4" ), "h4");
-  QLabel *label5 = CQStyleWidgetMgrInst->addT(new QLabel("Paragraph"), "p");
+  CQStyleWidgetMgr *mgr = CQStyleWidgetMgrInst;
 
-  llayout->addWidget(label1);
-  llayout->addWidget(label2);
-  llayout->addWidget(label3);
-  llayout->addWidget(label4);
-  llayout->addWidget(label5);
+  mgr->addHeader1(llayout, "Header 1");
+  mgr->addHeader2(llayout, "Header 2");
+  mgr->addHeader3(llayout, "Header 3");
+  mgr->addHeader4(llayout, "Header 4");
+
+  QLabel *label = mgr->add(new QLabel(
+    "Lorem ipsum dolor sit amet, consectetur adipisicing elit, \n"
+    "sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. \n"
+    "Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris \n"
+    "nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in \n"
+    "reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla \n"
+    "pariatur. Excepteur sint occaecat cupidatat non proident, sunt in \n"
+    "culpa qui officia deserunt mollit anim id est laborum."), "p");
+
+  llayout->addWidget(label);
   llayout->addStretch(1);
 
   CQStyleControl *control = new CQStyleControl;

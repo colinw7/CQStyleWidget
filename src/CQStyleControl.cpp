@@ -9,6 +9,7 @@
 #include <QListWidget>
 #include <QItemDelegate>
 #include <QLabel>
+#include <QLineEdit>
 #include <QPainter>
 
 CQStyleControl::
@@ -36,6 +37,7 @@ CQStyleControl(QWidget *parent) :
   bgCheck_     = new QCheckBox("Background");
   bgChooser_   = new CQColorChooser;
   fontChooser_ = new CQFontChooser;
+  spaceEdit_   = new QLineEdit;
 
   fgChooser_->setStyles(CQColorChooser::Text | CQColorChooser::ColorButton);
   bgChooser_->setStyles(CQColorChooser::Text | CQColorChooser::ColorButton);
@@ -50,19 +52,23 @@ CQStyleControl(QWidget *parent) :
           this, SLOT(bgColorChanged(const QColor &)));
   connect(fontChooser_, SIGNAL(fontChanged(const QFont &)),
           this, SLOT(fontChanged(const QFont &)));
+  connect(spaceEdit_, SIGNAL(returnPressed()),
+          this, SLOT(spaceChanged()));
 
   clayout->addWidget(new QLabel("Foreground"), 0, 0); clayout->addWidget(fgChooser_, 0, 1);
   clayout->addWidget(bgCheck_                , 1, 0); clayout->addWidget(bgChooser_, 1, 1);
 
   clayout->addWidget(fontChooser_, 2, 0, 1, 2);
 
-  clayout->setRowStretch(3, 1);
+  clayout->addWidget(new QLabel("Space"), 3, 0); clayout->addWidget(spaceEdit_, 3, 1);
+
+  clayout->setRowStretch(4, 1);
 
   slayout->addWidget(styleFrame);
   slayout->addLayout(clayout);
   slayout->addStretch(1);
 
-  styleLabel_ = CQStyleWidgetMgrInst->addT(new QLabel("Example Text"), "p");
+  styleLabel_ = CQStyleWidgetMgrInst->add(new QLabel("Example Text"), "p");
 
   layout->addLayout(slayout);
   layout->addWidget(styleLabel_);
@@ -106,12 +112,24 @@ fontChanged(const QFont &font)
 
 void
 CQStyleControl::
+spaceChanged()
+{
+  QString style = styleList_->currentStyle();
+
+  int space = spaceEdit_->text().toInt();
+
+  CQStyleWidgetMgrInst->setSpace(style, space);
+}
+
+void
+CQStyleControl::
 setCurrentStyle(const QString &style)
 {
   fgChooser_  ->setColor  (CQStyleWidgetMgrInst->getForeground   (style));
   bgCheck_    ->setChecked(CQStyleWidgetMgrInst->getBackgroundSet(style));
   bgChooser_  ->setColor  (CQStyleWidgetMgrInst->getBackground   (style));
   fontChooser_->setFont   (CQStyleWidgetMgrInst->getFont         (style));
+  spaceEdit_  ->setText   (QString("%1").arg(CQStyleWidgetMgrInst->getSpace(style)));
 
   CQStyleWidgetMgrInst->update(styleLabel_, style);
 }

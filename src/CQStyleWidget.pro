@@ -12,10 +12,12 @@ CONFIG += staticlib
 HEADERS += \
 ../include/CQStyleWidget.h \
 ../include/CQStyleControl.h \
+../include/CQStyleDivider.h \
 
 SOURCES += \
 CQStyleWidget.cpp \
 CQStyleControl.cpp \
+CQStyleDivider.cpp \
 
 OBJECTS_DIR = ../obj
 

@@ -8,6 +8,7 @@ class CQStyleList;
 class CQColorChooser;
 class CQFontChooser;
 class QCheckBox;
+class QLineEdit;
 class QLabel;
 
 class CQStyleControl : public QFrame {
@@ -27,12 +28,15 @@ class CQStyleControl : public QFrame {
 
   void fontChanged(const QFont &font);
 
+  void spaceChanged();
+
  private:
   CQStyleList    *styleList_;
   CQColorChooser *fgChooser_;
   QCheckBox      *bgCheck_;
   CQColorChooser *bgChooser_;
   CQFontChooser  *fontChooser_;
+  QLineEdit      *spaceEdit_;
   QLabel         *styleLabel_;
 };
 

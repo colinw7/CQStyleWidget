@@ -8,6 +8,20 @@
 
 #define CQStyleWidgetMgrInst CQStyleWidgetMgr::instance()
 
+class CQStyleWidgetIFace {
+ public:
+  CQStyleWidgetIFace() { }
+
+  virtual ~CQStyleWidgetIFace() { }
+
+  virtual void setForeground(QWidget *w, const QColor &fg);
+  virtual void setBackground(QWidget *w, const QColor &bg, bool bgSet);
+  virtual void setFont      (QWidget *w, const QFont &font);
+  virtual void setSpace     (QWidget *w, int space);
+};
+
+//------
+
 class CQStyleWidgetMgr : public QObject {
   Q_OBJECT
 
@@ -16,12 +30,17 @@ class CQStyleWidgetMgr : public QObject {
 
   void getStyleNames(std::vector<QString> &styleNames) const;
 
-  template<typename T>
-  T *addT(T *w, const QString &style) {
-    return static_cast<T *>(add(w, style));
-  }
+  QLabel *addHeader1(QLayout *l, const QString &text);
+  QLabel *addHeader2(QLayout *l, const QString &text);
+  QLabel *addHeader3(QLayout *l, const QString &text);
+  QLabel *addHeader4(QLayout *l, const QString &text);
 
-  QWidget *add(QWidget *w, const QString &style);
+  QLabel *addParagraph(QLayout *l, const QString &text);
+
+  template<typename T>
+  T *add(T *w, const QString &style) {
+    return static_cast<T *>(addWidget(w, style));
+  }
 
   void update(QWidget *w, const QString &style);
 
@@ -42,22 +61,23 @@ class CQStyleWidgetMgr : public QObject {
   QFont getFont(const QString &style) const;
   void setFont(const QString &style, const QFont &font);
 
+  int getSpace(const QString &style) const;
+  void setSpace(const QString &style, int space);
+
  private:
   struct StyleData;
+
+  QWidget *addWidget(QWidget *w, const QString &style);
 
   bool hasStyle(const QString &style) const;
 
   const StyleData &getStyle(const QString &style) const;
   StyleData &addStyle(const QString &style);
 
-  void initStyle(const QString &style, const QString &desc, const QColor &fg, const QFont &font);
+  void initStyle(const QString &style, const QString &desc, const QColor &fg,
+                 const QFont &font, int space);
 
   void applyStyle(QWidget *w, const StyleData &styleData);
-
-  void setForeground(QWidget *w, const QColor &fg);
-  void setBackground(QWidget *w, const QColor &bg, bool bgSet);
-
-  void setFont(QWidget *w, const QFont &font);
 
  signals:
   void styleAdded(const QString &style);
@@ -74,15 +94,17 @@ class CQStyleWidgetMgr : public QObject {
   typedef std::set<QWidget *> WidgetSet;
 
   struct StyleData {
-    QString   desc;
-    QColor    fg;
-    QColor    bg;
-    bool      bgSet;
-    QFont     font;
-    WidgetSet widgets;
+    QString             desc;
+    QColor              fg;
+    QColor              bg;
+    bool                bgSet;
+    QFont               font;
+    int                 space;
+    CQStyleWidgetIFace *iface;
+    WidgetSet           widgets;
 
     StyleData() :
-     fg(0,0,0), bg(255,255,255), bgSet(false), font(), widgets() {
+     fg(0,0,0), bg(255,255,255), bgSet(false), font(), space(0), iface(), widgets() {
     }
   };
 

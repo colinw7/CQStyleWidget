@@ -1,5 +1,48 @@
 #include <CQStyleWidget.h>
+#include <CQStyleDivider.h>
+#include <QLayout>
 #include <cassert>
+
+namespace CQStyleWidgetUtil {
+
+void setForeground(QWidget *w, const QColor &fg) {
+  QPalette palette = w->palette();
+
+  palette.setColor(QPalette::Text, fg);
+  palette.setColor(w->foregroundRole(), fg);
+
+  w->setPalette(palette);
+}
+
+void setBackground(QWidget *w, const QColor &bg, bool bgSet) {
+  CQStyleDivider *divider = qobject_cast<CQStyleDivider *>(w);
+  if (divider) return;
+
+  if (bgSet) {
+    QPalette palette = w->palette();
+
+    palette.setColor(w->backgroundRole(), bg);
+
+    w->setPalette(palette);
+  }
+
+  w->setAutoFillBackground(bgSet);
+}
+
+void setFont(QWidget *w, const QFont &font) {
+  w->setFont(font);
+}
+
+void setSpace(QWidget *w, int space) {
+  CQStyleDivider *divider = qobject_cast<CQStyleDivider *>(w);
+
+  if (divider)
+    divider->setHeight(space);
+}
+
+}
+
+//------
 
 CQStyleWidgetMgr *
 CQStyleWidgetMgr::
@@ -16,12 +59,14 @@ instance()
 CQStyleWidgetMgr::
 CQStyleWidgetMgr()
 {
+  QString fontName("Sans Serif");
+
   // define standard styles
-  initStyle("h1", "Header 1" , QColor("#E51C23"), QFont("Sans Serif", 16));
-  initStyle("h2", "Header 2" , QColor("#9C27B0"), QFont("Sans Serif", 15));
-  initStyle("h3", "Header 3" , QColor("#673AB7"), QFont("Sans Serif", 14));
-  initStyle("h4", "Header 4" , QColor("#009688"), QFont("Sans Serif", 13));
-  initStyle("p" , "Paragraph", QColor("#000000"), QFont("Sans Serif", 10));
+  initStyle("h1", "Header 1" , QColor("#E51C23"), QFont(fontName, 16), 8);
+  initStyle("h2", "Header 2" , QColor("#9C27B0"), QFont(fontName, 15), 4);
+  initStyle("h3", "Header 3" , QColor("#673AB7"), QFont(fontName, 14), 2);
+  initStyle("h4", "Header 4" , QColor("#009688"), QFont(fontName, 13), 0);
+  initStyle("p" , "Paragraph", QColor("#000000"), QFont(fontName, 10), 0);
 }
 
 bool
@@ -65,10 +110,10 @@ addStyle(const QString &style)
 }
 
 // TODO: initStyle from existing style
-
 void
 CQStyleWidgetMgr::
-initStyle(const QString &style, const QString &desc, const QColor &fg, const QFont &font)
+initStyle(const QString &style, const QString &desc, const QColor &fg,
+          const QFont &font, int space)
 {
   StyleData &styleData = addStyle(style);
 
@@ -77,6 +122,8 @@ initStyle(const QString &style, const QString &desc, const QColor &fg, const QFo
   styleData.bg    = QColor(255,255,255);
   styleData.bgSet = false;
   styleData.font  = font;
+  styleData.space = space;
+  styleData.iface = 0;
 
   emit styleChanged(style.toLower());
 }
@@ -90,9 +137,69 @@ getStyleNames(std::vector<QString> &styleNames) const
     styleNames.push_back((*p).first);
 }
 
+QLabel *
+CQStyleWidgetMgr::
+addHeader1(QLayout *l, const QString &text)
+{
+  QLabel *label = add(new QLabel(text), "h1");
+
+  l->addWidget(label);
+  l->addWidget(add(new CQStyleDivider("h1", 8), "h1"));
+
+  return label;
+}
+
+QLabel *
+CQStyleWidgetMgr::
+addHeader2(QLayout *l, const QString &text)
+{
+  QLabel *label = add(new QLabel(text), "h2");
+
+  l->addWidget(label);
+  l->addWidget(add(new CQStyleDivider("h2", 4), "h2"));
+
+  return label;
+}
+
+QLabel *
+CQStyleWidgetMgr::
+addHeader3(QLayout *l, const QString &text)
+{
+  QLabel *label = add(new QLabel(text), "h3");
+
+  l->addWidget(label);
+  l->addWidget(add(new CQStyleDivider("h3", 2), "h3"));
+
+  return label;
+}
+
+QLabel *
+CQStyleWidgetMgr::
+addHeader4(QLayout *l, const QString &text)
+{
+  QLabel *label = add(new QLabel(text), "h4");
+
+  l->addWidget(label);
+  l->addWidget(add(new CQStyleDivider("h4", 1), "h4"));
+
+  return label;
+}
+
+QLabel *
+CQStyleWidgetMgr::
+addParagraph(QLayout *l, const QString &text)
+{
+  QLabel *label = add(new QLabel(text), "p");
+
+  l->addWidget(label);
+  l->addWidget(add(new CQStyleDivider("p", 0), "p"));
+
+  return label;
+}
+
 QWidget *
 CQStyleWidgetMgr::
-add(QWidget *w, const QString &style)
+addWidget(QWidget *w, const QString &style)
 {
   remove(w);
 
@@ -183,9 +290,18 @@ void
 CQStyleWidgetMgr::
 applyStyle(QWidget *w, const StyleData &styleData)
 {
-  setForeground(w, styleData.fg);
-  setBackground(w, styleData.bg, styleData.bgSet);
-  setFont      (w, styleData.font);
+  if (styleData.iface) {
+    styleData.iface->setForeground(w, styleData.fg);
+    styleData.iface->setBackground(w, styleData.bg, styleData.bgSet);
+    styleData.iface->setFont      (w, styleData.font);
+    styleData.iface->setSpace     (w, styleData.space);
+  }
+  else {
+    CQStyleWidgetUtil::setForeground(w, styleData.fg);
+    CQStyleWidgetUtil::setBackground(w, styleData.bg, styleData.bgSet);
+    CQStyleWidgetUtil::setFont      (w, styleData.font);
+    CQStyleWidgetUtil::setSpace     (w, styleData.space);
+  }
 }
 
 QString
@@ -225,24 +341,14 @@ setForeground(const QString &style, const QColor &color)
 
   styleData.fg = color;
 
-  for (WidgetSet::iterator p = styleData.widgets.begin(); p != styleData.widgets.end(); ++p)
-    setForeground(*p, styleData.fg);
+  for (WidgetSet::iterator p = styleData.widgets.begin(); p != styleData.widgets.end(); ++p) {
+    if (styleData.iface)
+      styleData.iface->setForeground(*p, styleData.fg);
+    else
+      CQStyleWidgetUtil::setForeground(*p, styleData.fg);
+  }
 
   emit styleChanged(style.toLower());
-}
-
-void
-CQStyleWidgetMgr::
-setForeground(QWidget *w, const QColor &color)
-{
-  QPalette palette = w->palette();
-
-  //if (qobject_cast<QGroupBox *>(w)) { QGroupBox *group = qobject_cast<QGroupBox *>(w); }
-
-  palette.setColor(QPalette::Text, color);
-  palette.setColor(w->foregroundRole(), color);
-
-  w->setPalette(palette);
 }
 
 QColor
@@ -264,8 +370,12 @@ setBackground(const QString &style, const QColor &color)
   styleData.bg    = color;
   styleData.bgSet = color.isValid();
 
-  for (WidgetSet::iterator p = styleData.widgets.begin(); p != styleData.widgets.end(); ++p)
-    setBackground(*p, styleData.bg, styleData.bgSet);
+  for (WidgetSet::iterator p = styleData.widgets.begin(); p != styleData.widgets.end(); ++p) {
+    if (styleData.iface)
+      styleData.iface->setBackground(*p, styleData.bg, styleData.bgSet);
+    else
+      CQStyleWidgetUtil::setBackground(*p, styleData.bg, styleData.bgSet);
+  }
 
   emit styleChanged(style.toLower());
 }
@@ -288,25 +398,14 @@ setBackgroundSet(const QString &style, bool bgSet)
 
   styleData.bgSet = bgSet;
 
-  for (WidgetSet::iterator p = styleData.widgets.begin(); p != styleData.widgets.end(); ++p)
-    setBackground(*p, styleData.bg, styleData.bgSet);
-
-  emit styleChanged(style.toLower());
-}
-
-void
-CQStyleWidgetMgr::
-setBackground(QWidget *w, const QColor &color, bool bgSet)
-{
-  if (bgSet) {
-    QPalette palette = w->palette();
-
-    palette.setColor(w->backgroundRole(), color);
-
-    w->setPalette(palette);
+  for (WidgetSet::iterator p = styleData.widgets.begin(); p != styleData.widgets.end(); ++p) {
+    if (styleData.iface)
+      styleData.iface->setBackground(*p, styleData.bg, styleData.bgSet);
+    else
+      CQStyleWidgetUtil::setBackground(*p, styleData.bg, styleData.bgSet);
   }
 
-  w->setAutoFillBackground(bgSet);
+  emit styleChanged(style.toLower());
 }
 
 QFont
@@ -327,15 +426,70 @@ setFont(const QString &style, const QFont &font)
 
   styleData.font = font;
 
-  for (WidgetSet::iterator p = styleData.widgets.begin(); p != styleData.widgets.end(); ++p)
-    setFont(*p, font);
+  for (WidgetSet::iterator p = styleData.widgets.begin(); p != styleData.widgets.end(); ++p) {
+    if (styleData.iface)
+      styleData.iface->setFont(*p, styleData.font);
+    else
+      CQStyleWidgetUtil::setFont(*p, styleData.font);
+  }
 
   emit styleChanged(style.toLower());
 }
 
+int
+CQStyleWidgetMgr::
+getSpace(const QString &style) const
+{
+  if (! hasStyle(style))
+    return 0;
+
+  return getStyle(style).space;
+}
+
 void
 CQStyleWidgetMgr::
+setSpace(const QString &style, int space)
+{
+  StyleData &styleData = addStyle(style);
+
+  styleData.space = space;
+
+  for (WidgetSet::iterator p = styleData.widgets.begin(); p != styleData.widgets.end(); ++p) {
+    if (styleData.iface)
+      styleData.iface->setSpace(*p, styleData.space);
+    else
+      CQStyleWidgetUtil::setSpace(*p, styleData.space);
+  }
+
+  emit styleChanged(style.toLower());
+}
+
+//------
+
+void
+CQStyleWidgetIFace::
+setForeground(QWidget *w, const QColor &fg)
+{
+  CQStyleWidgetUtil::setForeground(w, fg);
+}
+
+void
+CQStyleWidgetIFace::
+setBackground(QWidget *w, const QColor &bg, bool bgSet)
+{
+  CQStyleWidgetUtil::setBackground(w, bg, bgSet);
+}
+
+void
+CQStyleWidgetIFace::
 setFont(QWidget *w, const QFont &font)
 {
-  w->setFont(font);
+  CQStyleWidgetUtil::setFont(w, font);
+}
+
+void
+CQStyleWidgetIFace::
+setSpace(QWidget *w, int space)
+{
+  CQStyleWidgetUtil::setSpace(w, space);
 }

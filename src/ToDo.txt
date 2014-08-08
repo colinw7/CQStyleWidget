@@ -1,5 +1,14 @@
 . hierarchy (style group) or widget name ?
-. style for non-label widgets
+. style for non-label widgets (groupbox, line edit, text (read-only same as label))
 . set property by style h1.font, h2.color, ...
 . style desc
 . custom widget support (fore/back/font) or rely on notifications
+. html/xml scripting to describe label format and by name access to layout
+
+<form>
+<h1>Header 1</h1>
+<h2>Header 2</h1>
+<hlayout name="layout1">
+<p>Hello</p>
+</hlayout>
+</form>
