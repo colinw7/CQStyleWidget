@@ -30,6 +30,8 @@ class CQStyleWidgetMgr : public QObject {
 
   void getStyleNames(std::vector<QString> &styleNames) const;
 
+  bool hasStyle(const QString &style) const;
+
   QLabel *addHeader1(QLayout *l, const QString &text);
   QLabel *addHeader2(QLayout *l, const QString &text);
   QLabel *addHeader3(QLayout *l, const QString &text);
@@ -37,14 +39,18 @@ class CQStyleWidgetMgr : public QObject {
 
   QLabel *addParagraph(QLayout *l, const QString &text);
 
+  QLabel *addStyleLabel(QLayout *l, const QString &text, const QString &style);
+
+  bool isStyleWidget(QWidget *w) const;
+
   template<typename T>
   T *add(T *w, const QString &style) {
     return static_cast<T *>(addWidget(w, style));
   }
 
-  void update(QWidget *w, const QString &style);
+  void updateWidgetStyle(QWidget *w, const QString &style);
 
-  void remove(QWidget *w);
+  void removeWidget(QWidget *w);
 
   QString getDescription(const QString &style) const;
   void setDescription(const QString &style, const QString &desc);
@@ -64,12 +70,22 @@ class CQStyleWidgetMgr : public QObject {
   int getSpace(const QString &style) const;
   void setSpace(const QString &style, int space);
 
+  const QString &primaryColorSet() const { return primaryColorSet_; }
+  void setPrimaryColorSet(const QString &name);
+
+  const QString &textColorSet() const { return textColorSet_; }
+  void setTextColorSet(const QString &name);
+
+  const QFont &baseFont() const { return baseFont_; }
+  void setBaseFont(const QFont &f);
+
+  int spacing() const { return spacing_; }
+  void setSpacing(int spacing);
+
  private:
   struct StyleData;
 
   QWidget *addWidget(QWidget *w, const QString &style);
-
-  bool hasStyle(const QString &style) const;
 
   const StyleData &getStyle(const QString &style) const;
   StyleData &addStyle(const QString &style);
@@ -104,7 +120,7 @@ class CQStyleWidgetMgr : public QObject {
     WidgetSet           widgets;
 
     StyleData() :
-     fg(0,0,0), bg(255,255,255), bgSet(false), font(), space(0), iface(), widgets() {
+     fg(0,0,0), bg(255,255,255), bgSet(false), font(), space(0), iface(0), widgets() {
     }
   };
 
@@ -113,6 +129,10 @@ class CQStyleWidgetMgr : public QObject {
 
   StyleDataMap   styleData_;
   WidgetStyleMap widgets_;
+  QString        primaryColorSet_;
+  QString        textColorSet_;
+  QFont          baseFont_;
+  int            spacing_;
 };
 
 #endif

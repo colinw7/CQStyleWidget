@@ -26,4 +26,5 @@ DESTDIR = ../lib
 INCLUDEPATH += \
 . \
 ../include \
+../../CQColorPalette/include \
 ../../CQUtil/include \

@@ -1,5 +1,6 @@
 #include <CQStyleWidget.h>
 #include <CQStyleDivider.h>
+#include <CColorPalette.h>
 #include <QLayout>
 #include <cassert>
 
@@ -61,12 +62,19 @@ CQStyleWidgetMgr()
 {
   QString fontName("Sans Serif");
 
+  setPrimaryColorSet("Red");
+  setTextColorSet   ("Grey");
+  setBaseFont       (QFont(fontName, 10));
+  setSpacing        (4);
+
+#if 0
   // define standard styles
   initStyle("h1", "Header 1" , QColor("#E51C23"), QFont(fontName, 16), 8);
   initStyle("h2", "Header 2" , QColor("#9C27B0"), QFont(fontName, 15), 4);
   initStyle("h3", "Header 3" , QColor("#673AB7"), QFont(fontName, 14), 2);
   initStyle("h4", "Header 4" , QColor("#009688"), QFont(fontName, 13), 0);
   initStyle("p" , "Paragraph", QColor("#000000"), QFont(fontName, 10), 0);
+#endif
 }
 
 bool
@@ -141,67 +149,61 @@ QLabel *
 CQStyleWidgetMgr::
 addHeader1(QLayout *l, const QString &text)
 {
-  QLabel *label = add(new QLabel(text), "h1");
-
-  l->addWidget(label);
-  l->addWidget(add(new CQStyleDivider("h1", 8), "h1"));
-
-  return label;
+  return addStyleLabel(l, text, "h1");
 }
 
 QLabel *
 CQStyleWidgetMgr::
 addHeader2(QLayout *l, const QString &text)
 {
-  QLabel *label = add(new QLabel(text), "h2");
-
-  l->addWidget(label);
-  l->addWidget(add(new CQStyleDivider("h2", 4), "h2"));
-
-  return label;
+  return addStyleLabel(l, text, "h2");
 }
 
 QLabel *
 CQStyleWidgetMgr::
 addHeader3(QLayout *l, const QString &text)
 {
-  QLabel *label = add(new QLabel(text), "h3");
-
-  l->addWidget(label);
-  l->addWidget(add(new CQStyleDivider("h3", 2), "h3"));
-
-  return label;
+  return addStyleLabel(l, text, "h3");
 }
 
 QLabel *
 CQStyleWidgetMgr::
 addHeader4(QLayout *l, const QString &text)
 {
-  QLabel *label = add(new QLabel(text), "h4");
-
-  l->addWidget(label);
-  l->addWidget(add(new CQStyleDivider("h4", 1), "h4"));
-
-  return label;
+  return addStyleLabel(l, text, "h4");
 }
 
 QLabel *
 CQStyleWidgetMgr::
 addParagraph(QLayout *l, const QString &text)
 {
-  QLabel *label = add(new QLabel(text), "p");
+  return addStyleLabel(l, text, "p");
+}
+
+QLabel *
+CQStyleWidgetMgr::
+addStyleLabel(QLayout *l, const QString &text, const QString &style)
+{
+  QLabel *label = add(new QLabel(text), style);
 
   l->addWidget(label);
-  l->addWidget(add(new CQStyleDivider("p", 0), "p"));
+  l->addWidget(add(new CQStyleDivider(style, getSpace(style)), style));
 
   return label;
+}
+
+bool
+CQStyleWidgetMgr::
+isStyleWidget(QWidget *w) const
+{
+  return (widgets_.find(w) != widgets_.end());
 }
 
 QWidget *
 CQStyleWidgetMgr::
 addWidget(QWidget *w, const QString &style)
 {
-  remove(w);
+  removeWidget(w);
 
   StyleData &styleData = addStyle(style);
 
@@ -222,12 +224,12 @@ removeSlot(QObject *o)
 {
   QWidget *w = qobject_cast<QWidget *>(o);
 
-  remove(w);
+  removeWidget(w);
 }
 
 void
 CQStyleWidgetMgr::
-remove(QWidget *w)
+removeWidget(QWidget *w)
 {
   WidgetStyleMap::iterator pw = widgets_.find(w);
 
@@ -248,7 +250,7 @@ remove(QWidget *w)
 
 void
 CQStyleWidgetMgr::
-update(QWidget *w, const QString &style)
+updateWidgetStyle(QWidget *w, const QString &style)
 {
   WidgetStyleMap::iterator pw = widgets_.find(w);
   assert(pw != widgets_.end());
@@ -284,6 +286,69 @@ update(QWidget *w, const QString &style)
 
   if (! found)
     emit styleAdded(newStyle);
+}
+
+void
+CQStyleWidgetMgr::
+setPrimaryColorSet(const QString &name)
+{
+  primaryColorSet_ = name;
+
+  QColor color500 = ColorPaletteInst->getColor(primaryColorSet_, "500");
+  QColor color700 = ColorPaletteInst->getColor(primaryColorSet_, "700");
+  QColor color900 = ColorPaletteInst->getColor(primaryColorSet_, "900");
+
+  setBackground("h1", color500);
+  setForeground("h1", ColorPalette::textColor(color500));
+
+  setForeground("h2", color700);
+  setForeground("h3", color900);
+}
+
+void
+CQStyleWidgetMgr::
+setTextColorSet(const QString &name)
+{
+  textColorSet_ = name;
+
+  QColor color500 = ColorPaletteInst->getColor(textColorSet_, "500");
+  QColor color700 = ColorPaletteInst->getColor(textColorSet_, "700");
+
+  setForeground("h4", color500);
+  setForeground("p" , color700);
+}
+
+void
+CQStyleWidgetMgr::
+setBaseFont(const QFont &f)
+{
+  baseFont_ = f;
+
+  int fs = baseFont_.pointSize();
+
+  QFont font1(f); font1.setPointSize(fs*1.3);
+  QFont font2(f); font2.setPointSize(fs*1.2);
+  QFont font3(f); font2.setPointSize(fs*1.1);
+  QFont font4(f); font2.setPointSize(fs*1.0);
+
+  setFont("h1", font1);
+  setFont("h2", font2);
+  setFont("h3", font3);
+  setFont("h4", font4);
+  setFont("p" , baseFont_);
+}
+
+void
+CQStyleWidgetMgr::
+setSpacing(int space)
+{
+  spacing_ = space;
+
+  setSpace("h1", space  );
+  setSpace("h2", space/2);
+  setSpace("h3", space/3);
+  setSpace("h4", space/4);
+  setSpace("p" , 0);
 }
 
 void

@@ -131,7 +131,7 @@ setCurrentStyle(const QString &style)
   fontChooser_->setFont   (CQStyleWidgetMgrInst->getFont         (style));
   spaceEdit_  ->setText   (QString("%1").arg(CQStyleWidgetMgrInst->getSpace(style)));
 
-  CQStyleWidgetMgrInst->update(styleLabel_, style);
+  CQStyleWidgetMgrInst->updateWidgetStyle(styleLabel_, style);
 }
 
 //------
@@ -240,6 +240,7 @@ CQStyleList::
 currentStyle() const
 {
   CQStyleListItem *item = static_cast<CQStyleListItem *>(currentItem());
+  if (! item) return "";
 
   return item->name();
 }
