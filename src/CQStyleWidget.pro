@@ -2,22 +2,25 @@ TEMPLATE = lib
 
 TARGET = CQStyleWidget
 
-DEPENDPATH += .
-
 QT += widgets
 
-CONFIG += staticlib
+DEPENDPATH += .
 
-# Input
-HEADERS += \
-../include/CQStyleWidget.h \
-../include/CQStyleControl.h \
-../include/CQStyleDivider.h \
+QMAKE_CXXFLAGS += -std=c++14
+
+MOC_DIR = .moc
+
+CONFIG += staticlib
 
 SOURCES += \
 CQStyleWidget.cpp \
 CQStyleControl.cpp \
 CQStyleDivider.cpp \
+
+HEADERS += \
+../include/CQStyleWidget.h \
+../include/CQStyleControl.h \
+../include/CQStyleDivider.h \
 
 OBJECTS_DIR = ../obj
 
