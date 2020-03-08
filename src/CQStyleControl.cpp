@@ -142,6 +142,8 @@ class CQStyleListItem : public QListWidgetItem {
    list_(list), name_(name), desc_(desc) {
   }
 
+  CQStyleList *list() const { return list_; }
+
   const QString &name() const { return name_; }
   const QString &desc() const { return desc_; }
 
