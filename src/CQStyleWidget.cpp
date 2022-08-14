@@ -326,10 +326,10 @@ setBaseFont(const QFont &f)
 
   int fs = baseFont_.pointSize();
 
-  QFont font1(f); font1.setPointSize(fs*1.3);
-  QFont font2(f); font2.setPointSize(fs*1.2);
-  QFont font3(f); font2.setPointSize(fs*1.1);
-  QFont font4(f); font2.setPointSize(fs*1.0);
+  QFont font1(f); font1.setPointSize(int(fs*1.3));
+  QFont font2(f); font2.setPointSize(int(fs*1.2));
+  QFont font3(f); font2.setPointSize(int(fs*1.1));
+  QFont font4(f); font2.setPointSize(int(fs*1.0));
 
   setFont("h1", font1);
   setFont("h2", font2);
