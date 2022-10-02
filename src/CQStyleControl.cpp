@@ -165,9 +165,9 @@ class CQStyleListDelegate : public QItemDelegate {
 
     CQStyleListItem *item = static_cast<CQStyleListItem *>(list_->item(index.row()));
 
-    //painter->fillRect(option.rect, QColor(255,255,255));
+    //painter->fillRect(option.rect, QColor(255, 255, 255));
 
-    painter->setPen(QColor(0,0,0));
+    painter->setPen(QColor(0, 0, 0));
 
     int border = 4;
 
@@ -182,7 +182,7 @@ class CQStyleListDelegate : public QItemDelegate {
                       item->desc());
 
     //if (option.state & QStyle::State_Selected)
-    //  painter->drawRect(option.rect.adjusted(0,0,-1,-1));
+    //  painter->drawRect(option.rect.adjusted(0, 0, -1, -1));
   }
 
   QSize sizeHint(const QStyleOptionViewItem &, const QModelIndex &index) const {
@@ -192,7 +192,7 @@ class CQStyleListDelegate : public QItemDelegate {
 
     QString str = QString("%1 %2").arg(item->name()).arg(item->desc());
 
-    return QSize(fm.width(str) + 32, fm.height() + 8);
+    return QSize(fm.horizontalAdvance(str) + 32, fm.height() + 8);
   }
 
  private:

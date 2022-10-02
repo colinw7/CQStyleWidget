@@ -127,7 +127,7 @@ initStyle(const QString &style, const QString &desc, const QColor &fg,
 
   styleData.desc  = desc;
   styleData.fg    = fg;
-  styleData.bg    = QColor(255,255,255);
+  styleData.bg    = QColor(255, 255, 255);
   styleData.bgSet = false;
   styleData.font  = font;
   styleData.space = space;
@@ -393,7 +393,7 @@ CQStyleWidgetMgr::
 getForeground(const QString &style) const
 {
   if (! hasStyle(style))
-    return QColor(0,0,0);
+    return QColor(0, 0, 0);
 
   return getStyle(style).fg;
 }

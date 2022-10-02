@@ -84,7 +84,7 @@ paintEvent(QPaintEvent *)
 
   QPainter painter(this);
 
-  painter.setPen(QColor(128,128,128));
+  painter.setPen(QColor(128, 128, 128));
 
   if (orient_ == Qt::Horizontal) {
     int y = rect().center().y();
