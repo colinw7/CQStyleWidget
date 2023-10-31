@@ -160,7 +160,7 @@ class CQStyleListDelegate : public QItemDelegate {
   }
 
   void paint(QPainter *painter, const QStyleOptionViewItem &option,
-             const QModelIndex &index) const {
+             const QModelIndex &index) const override {
     QItemDelegate::paint(painter, option, index);
 
     CQStyleListItem *item = static_cast<CQStyleListItem *>(list_->item(index.row()));
@@ -185,7 +185,7 @@ class CQStyleListDelegate : public QItemDelegate {
     //  painter->drawRect(option.rect.adjusted(0, 0, -1, -1));
   }
 
-  QSize sizeHint(const QStyleOptionViewItem &, const QModelIndex &index) const {
+  QSize sizeHint(const QStyleOptionViewItem &, const QModelIndex &index) const override {
     CQStyleListItem *item = static_cast<CQStyleListItem *>(list_->item(index.row()));
 
     QFontMetrics fm(list_->font());

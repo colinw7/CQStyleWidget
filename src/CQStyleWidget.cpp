@@ -131,7 +131,7 @@ initStyle(const QString &style, const QString &desc, const QColor &fg,
   styleData.bgSet = false;
   styleData.font  = font;
   styleData.space = space;
-  styleData.iface = 0;
+  styleData.iface = nullptr;
 
   emit styleChanged(style.toLower());
 }
