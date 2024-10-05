@@ -20,7 +20,7 @@ CQStyleDivider(QWidget *parent, const QString &style, int height) :
 
 CQStyleDivider::
 CQStyleDivider(const QString &style, const Type &type, int height) :
- QFrame(0), style_(style), orient_(Qt::Horizontal), type_(type), height_(height),
+ QFrame(nullptr), style_(style), orient_(Qt::Horizontal), type_(type), height_(height),
  lindent_(6), rindent_(6)
 {
   updateState();
@@ -28,7 +28,7 @@ CQStyleDivider(const QString &style, const Type &type, int height) :
 
 CQStyleDivider::
 CQStyleDivider(const QString &style, int height) :
- QFrame(0), style_(style), orient_(Qt::Horizontal), type_(NoType), height_(height),
+ QFrame(nullptr), style_(style), orient_(Qt::Horizontal), type_(NoType), height_(height),
  lindent_(6), rindent_(6)
 {
   updateState();
